@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import * as d3 from 'd3';
+import realTime from './realTime';
 
 class LineChart extends Component {
   componentDidMount = () => {
@@ -32,8 +33,15 @@ class LineChart extends Component {
     } else {
       g = svg.select('.line-graph');
     }
-    const x = d3.scaleLinear()
-      .rangeRound([0, width]);
+    let x;
+    if (this.props.timeChart) {
+      x = d3.scaleTime()
+        .rangeRound([0, width]);
+    } else {
+      x = d3.scaleLinear()
+        .rangeRound([0, width]);
+    }
+
     const y = d3.scaleLinear()
       .rangeRound([height, 0]);
     const line = d3.line()
@@ -45,10 +53,20 @@ class LineChart extends Component {
 
     g.selectAll('.axis').remove();
 
+    let xAxis;
+    console.log(this.props.timeChart);
+    if (this.props.timeChart) {
+      xAxis = d3.axisBottom(x)
+        .ticks(10)
+        .tickFormat(d3.timeFormat('%H:%M:%S'))
+    } else {
+      xAxis = d3.axisBottom(x);
+    }
+
     g.append("g")
       .attr('class', 'x axis')
       .attr("transform", "translate(0," + height + ")")
-      .call(d3.axisBottom(x))
+      .call(xAxis)
       .select(".domain")
       .remove();
 
@@ -60,8 +78,7 @@ class LineChart extends Component {
       .attr("transform", "rotate(-90)")
       .attr("y", 6)
       .attr("dy", "0.71em")
-      .attr("text-anchor", "end")
-      .text("Price ($)");
+      .attr("text-anchor", "end");
 
     g.select('.line').remove();
 
@@ -92,11 +109,18 @@ LineChart.propTypes = {
       y: PropTypes.number,
     })
   ).isRequired,
+  timeChart: PropTypes.bool,
 }
 
 LineChart.defaultProps = {
   width: 960,
   height: 500,
+  timeChart: false,
 }
 
-export default LineChart;
+const LineChartInRealTime = realTime(LineChart);
+
+export {
+  LineChart,
+  LineChartInRealTime,
+};
