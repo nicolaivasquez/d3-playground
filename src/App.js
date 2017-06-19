@@ -22,6 +22,7 @@ class App extends Component {
       openDrawer: false,
     }
   }
+
   handleToggleDrawer = () => this.setState({
     openDrawer: !this.state.openDrawer
   });
