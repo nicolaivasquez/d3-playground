@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import {
   LineChartInRealTime
 } from './components/LineChart/index';
+import {
+  LineChartReactInRealTime
+} from './components/LineChartReact/index';
 
 class RealTimeLineChart extends Component {
   constructor(props) {
@@ -24,6 +27,9 @@ class RealTimeLineChart extends Component {
         <h1>Real Time Line Chart</h1>
         <div className="chart">
           <LineChartInRealTime
+            data={this.state.data}
+          />
+          <LineChartReactInRealTime
             data={this.state.data}
           />
         </div>

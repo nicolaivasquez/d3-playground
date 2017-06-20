@@ -123,6 +123,7 @@ class LineChart extends Component {
         .ease(d3.easeLinear)
         .attr('transform', `translate(${diff})`)
 
+      console.log(line(data));
     }
   }
 
