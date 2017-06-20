@@ -24,16 +24,6 @@ class LineChart extends Component {
       .attr('width', this.props.width)
       .attr('height', this.props.height);
 
-    let defs;
-    if (svg.select('defs').empty()) {
-      defs = svg.append('defs');
-      defs.append('clipPath')
-        .attr('id', 'drawable')
-        .append('rect')
-        .attr('width', width)
-        .attr('height', height);
-    }
-
     let g;
 
     if (svg.select('.line-graph').empty()) {
@@ -43,6 +33,17 @@ class LineChart extends Component {
     } else {
       g = svg.select('.line-graph');
     }
+
+    let defs;
+    if (g.select('defs').empty()) {
+      defs = g.append('defs');
+      defs.append('clipPath')
+        .attr('id', 'drawable')
+        .append('rect')
+        .attr('width', width)
+        .attr('height', height);
+    }
+
     let x;
     if (this.props.timeChart) {
       x = d3.scaleTime()
