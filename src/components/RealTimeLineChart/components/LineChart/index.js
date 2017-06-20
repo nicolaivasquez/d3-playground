@@ -24,6 +24,16 @@ class LineChart extends Component {
       .attr('width', this.props.width)
       .attr('height', this.props.height);
 
+    let defs;
+    if (svg.select('defs').empty()) {
+      defs = svg.append('defs');
+      defs.append('clipPath')
+        .attr('id', 'drawable')
+        .append('rect')
+        .attr('width', width)
+        .attr('height', height);
+    }
+
     let g;
 
     if (svg.select('.line-graph').empty()) {
@@ -48,13 +58,16 @@ class LineChart extends Component {
       .x((d) => x(d.x))
       .y((d) => y(d.y));
 
-    x.domain(d3.extent(data, (d) => d.x));
+    if (this.props.timeChart) {
+      x.domain([data[data.length - 1].x - 51000, data[data.length - 1].x - 1000]);
+    } else {
+      x.domain(d3.extent(data, (d) => d.x));
+    }
     y.domain(d3.extent(data, (d) => d.y));
 
     g.selectAll('.axis').remove();
 
     let xAxis;
-    console.log(this.props.timeChart);
     if (this.props.timeChart) {
       xAxis = d3.axisBottom(x)
         .ticks(10)
@@ -80,17 +93,36 @@ class LineChart extends Component {
       .attr("dy", "0.71em")
       .attr("text-anchor", "end");
 
-    g.select('.line').remove();
+    let path;
+    if (g.select('.line').empty()) {
+      path = g
+        .append('g')
+        .attr('clip-path', 'url(#drawable)')
+        .append('path')
+        .data([data])
+        .attr('class', 'line')
+        .attr('fill', 'none')
+        .attr('stroke', 'steelblue')
+        .attr('stroke-linejoin', 'round')
+        .attr('stroke-linecap', 'round')
+        .attr('stroke-width', 1.5)
+        .attr('clip-path', 'url(#drawable)')
+        .attr('d', line);
+    } else {
+      path = g.select('.line');
 
-    g.append('path')
-      .data([data])
-      .attr('class', 'line')
-      .attr('fill', 'none')
-      .attr('stroke', 'steelblue')
-      .attr('stroke-linejoin', 'round')
-      .attr('stroke-linecap', 'round')
-      .attr('stroke-width', 1.5)
-      .attr('d', line);
+      const lastTwo = data.slice(-2);
+      const diff = x(lastTwo[0].x) - x(lastTwo[1].x);
+
+      path
+        .data([data])
+        .attr('d', line)
+        .attr('transform', null)
+        .transition()
+        .ease(d3.easeLinear)
+        .attr('transform', `translate(${diff})`)
+
+    }
   }
 
   render() {
